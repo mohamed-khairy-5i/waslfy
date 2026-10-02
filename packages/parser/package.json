@@ -1,0 +1,24 @@
+{
+  "name": "waslfy-parser",
+  "version": "0.1.0",
+  "description": "Zero-dependency extraction engine for Egyptian e-commerce order messages (Arabic/Egyptian dialect) — name, phones, governorate, address, COD amount.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "keywords": ["arabic", "nlp", "egypt", "shipping", "extraction", "cod", "order"],
+  "license": "MIT",
+  "scripts": {
+    "test": "vitest run",
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "demo": "tsx demo/cli.ts"
+  }
+}

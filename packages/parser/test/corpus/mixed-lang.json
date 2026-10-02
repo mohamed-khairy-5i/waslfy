@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "id": "m01",
+      "text": "Name: Mohamed Ali\nAddress: Nasr City, Cairo - 9 Mostafa El Nahhas\nPhone: 01022334455\nCOD: 500 EGP",
+      "expect": {
+        "name": "Mohamed Ali",
+        "phones": ["01022334455"],
+        "gov": "cairo",
+        "amount": 500,
+        "address": "mostafa el nahhas"
+      }
+    },
+    {
+      "id": "m02",
+      "text": "الاسم: نور أشرف\nالعنوان: 5 شارع جامعة الدول المهندسين الجيزة\nMobile: 01277665544\nالمبلغ 670 جنيه",
+      "expect": {
+        "name": "نور أشرف",
+        "phones": ["01277665544"],
+        "gov": "giza",
+        "amount": 670,
+        "address": "شارع جامعة الدول المهندسين"
+      }
+    },
+    {
+      "id": "m03",
+      "text": "hi, want to order\nاسمي كريم فؤاد\nمقيم في بورسعيد حي الضوء شارع 25 يوليو\nmy number 01155667799\nدفع 430 ج كاش",
+      "expect": {
+        "name": "كريم فؤاد",
+        "phones": ["01155667799"],
+        "gov": "port-said",
+        "amount": 430,
+        "address": "حي الضوء شارع 25 يوليو"
+      }
+    },
+    {
+      "id": "m04",
+      "text": "Order for:\nالاسم: دينا حسام\nالعنوان: الإسكندرية سيدي جابر شارع أبو قير برج الأمل الدور 3\nTel: 01522334455\nCash 380 ج",
+      "expect": {
+        "name": "دينا حسام",
+        "phones": ["01522334455"],
+        "gov": "alexandria",
+        "amount": 380,
+        "address": "سيدي جابر شارع أبو قير"
+      }
+    },
+    {
+      "id": "m05",
+      "text": "اسم العميل: حازم مصطفى\nالمنصورة الدقهلية عنواني شارع الترعة جنب كافيه لندن\nwhatsapp: 01044556677\nمبلغ 1400 ج",
+      "expect": {
+        "name": "حازم مصطفى",
+        "phones": ["01044556677"],
+        "gov": "dakahlia",
+        "amount": 1400,
+        "address": "شارع الترعة جنب كافيه لندن"
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "waslfy",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "demo": "tsx packages/parser/demo/cli.ts",
+    "build": "npm run build -w packages/parser"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "tsup": "^8.5.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  }
+}
