@@ -4,7 +4,7 @@
  * and Arabic-Indic digits (handled upstream by prepare()).
  */
 import type { Field } from '../types';
-import { prepare } from '../normalize';
+import { prepare, buildCaseMap } from '../normalize';
 
 const PHONE_SPAN = /(?:\+?20|0020)?[\s.\-]*0?1[0125](?:[\s.\-]*\d){8}/g;
 
@@ -38,4 +38,26 @@ export function extractPhones(raw: string): Field<string[]> {
 /** Replace every phone span with spaces so downstream fields don't digest phone digits. */
 export function maskPhones(text: string): string {
   return text.replace(phoneSpanRegex(), (m) => ' '.repeat(m.length));
+}
+
+/**
+ * Same masking as maskPhones() but applied to the ORIGINAL text (original
+ * casing preserved). Phone spans are located on the prepared form, then mapped
+ * back through the case map and blanked with spaces in the original.
+ * Used so name/address extractors can work on case-preserved input.
+ */
+export function maskPhonesKeepCase(raw: string): string {
+  const { prepared, map } = buildCaseMap(raw ?? '');
+  let out = '';
+  let pos = 0;
+  for (const m of prepared.matchAll(phoneSpanRegex())) {
+    const start = m.index ?? 0;
+    const end = start + m[0].length;
+    if (end - 1 >= map.length) continue;
+    const rawStart = map[start];
+    const rawEnd = map[end - 1] + 1;
+    out += (raw ?? '').slice(pos, rawStart) + ' '.repeat(rawEnd - rawStart);
+    pos = rawEnd;
+  }
+  return out + (raw ?? '').slice(pos);
 }

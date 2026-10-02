@@ -5,7 +5,7 @@
  */
 import type { Field } from '../types';
 import { emptyField } from '../types';
-import { prepare } from '../normalize';
+import { prepare, restoreCase } from '../normalize';
 import { extractGovernorate } from './governorate';
 
 const NAME_LABEL =
@@ -64,7 +64,7 @@ export function extractName(raw: string): Field<string> {
   if (labeled && labeled[1]) {
     const c = cleanCandidate(labeled[1]);
     if (isPlausibleName(c)) {
-      return { value: c, confidence: 'high', source: 'pattern:labeled' };
+      return { value: restoreCase(raw, c), confidence: 'high', source: 'pattern:labeled' };
     }
   }
 
@@ -91,7 +91,8 @@ export function extractName(raw: string): Field<string> {
   }
 
   if (candidates.length > 0) {
-    const [best, ...rest] = candidates;
+    const restored = candidates.map((c) => restoreCase(raw, c));
+    const [best, ...rest] = restored;
     const f: Field<string> = {
       value: best,
       confidence: 'medium',

@@ -5,7 +5,7 @@
  */
 import type { Field } from '../types';
 import { emptyField } from '../types';
-import { prepare } from '../normalize';
+import { prepare, restoreCase } from '../normalize';
 
 const ADDRESS_LABEL =
   '(?:العنوان|عنواني|عنوان|عنوان البنايه|عنوان التسليم|address|addr)';
@@ -32,7 +32,7 @@ export function extractAddress(raw: string): Field<string> {
   if (labeled && labeled[1]) {
     const v = cutAtStop(labeled[1]);
     if (v.length >= 4) {
-      return { value: v, confidence: 'medium', source: 'pattern:labeled' };
+      return { value: restoreCase(raw, v), confidence: 'medium', source: 'pattern:labeled' };
     }
   }
 
@@ -45,7 +45,7 @@ export function extractAddress(raw: string): Field<string> {
     if (anchorRe.test(l)) {
       const v = cutAtStop(l);
       if (v.length >= 4) {
-        return { value: v, confidence: 'low', source: 'context:anchors' };
+        return { value: restoreCase(raw, v), confidence: 'low', source: 'context:anchors' };
       }
     }
   }
