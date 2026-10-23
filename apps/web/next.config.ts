@@ -7,7 +7,7 @@ import type { NextConfig } from "next";
  *   with optional BASE_PATH (e.g. "/waslfy") set by the deploy workflow.
  */
 const isStaticExport = process.env.STATIC_EXPORT === "1";
-const basePath = process.env.BASE_PATH ?? "";
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? process.env.BASE_PATH ?? "";
 
 const nextConfig: NextConfig = {
   ...(isStaticExport
