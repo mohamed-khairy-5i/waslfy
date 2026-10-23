@@ -11,6 +11,10 @@ All notable changes to Waslfy are documented here. Format based on [Keep a Chang
 ### Changed — CI/CD
 - workflows: `npm ci` + npm cache everywhere; wrangler pinned to v4 in the Cloudflare Pages job (a transient Cloudflare 10500 flake had failed one deploy; token + project were verified healthy)
 
+### Added — release & landing (M7.1)
+- first tagged release [v0.1.1](https://github.com/mohamed-khairy-5i/waslfy/releases/tag/v0.1.1) — validated the automated npm publish pipeline (version-guard skip path, green run)
+- demo GIF in README (recorded from the live app) + 1200×630 OG/Twitter card image (`og-image.png`) wired into app metadata
+
 ## [0.1.0] — 2026-10
 
 ### Added — parser (`waslfy-parser@0.1.0`)

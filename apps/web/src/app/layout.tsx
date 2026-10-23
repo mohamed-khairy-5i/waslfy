@@ -39,6 +39,15 @@ export const metadata: Metadata = {
     description:
       "الصق رسالة العميل — المحرك يقرأ الاسم والرقم والمحافظة والعنوان والمبلغ، ويحجب أي بيانات ناقصة قبل الطباعة.",
     type: "website",
+    locale: "ar_EG",
+    siteName: "Waslfy — وصلّي",
+    images: [{ url: `${BP}/og-image.png`, width: 1200, height: 630, alt: "وصلّي — إيصال الاستخراج" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "وصلّي Waslfy — من رسالة واتساب لإيصال شحن",
+    description: "استخراج بيانات الشحن المصرية محليًا — بيانات عملائك عمرها ما بتسيب جهازك.",
+    images: [`${BP}/og-image.png`],
   },
 };
 

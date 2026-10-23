@@ -14,6 +14,8 @@
 
 التاجر المصري بيستقبل عشرات الطلبات يوميًا كرسائل واتساب حرة، وبيقعد ينسخ الاسم والتليفون والعنوان والمبلغ بإيده لشيت شركة الشحن. **وصلّي بيقرأ الرسالة وبيطلّع بيانات الشحنة منظمة في أقل من ملي ثانية** — وبحجب أي بيانات ناقصة قبل الطباعة أو التصدير، لأن شحنات COD الغلط بتتكلف فلوس حقيقية.
 
+![عرض حي — من رسالة عادية لإيصال شحن](docs/demo.gif)
+
 | الصفحة الرئيسية | إيصال الاستخراج | الموبايل |
 | --- | --- | --- |
 | ![الصفحة الرئيسية](docs/home.png) | ![التذكرة](docs/ticket.png) | ![الموبايل](docs/mobile.png) |
@@ -133,7 +135,7 @@ Ran a real order the parser gets wrong? **Open an issue with the raw text (redac
 - [x] **M5** — Offline PWA (installable, works with no network — hand-rolled service worker, no next-pwa dependency)
 - [ ] **M6** — Smart Mode (optional AI assist via server-side worker for the hard messages — still no data storage)
 - [x] **M7** — npm publish ([waslfy-parser@0.1.0](https://www.npmjs.com/package/waslfy-parser)) + dual hosting (Cloudflare Pages + GitHub Pages)
-- [ ] **M7.1** — landing page + demo GIF
+- [x] **M7.1** — repo landing polish (demo GIF in README + OG/Twitter card image) + first release [v0.1.1](https://github.com/mohamed-khairy-5i/waslfy/releases/tag/v0.1.1)
 
 ## Contributing / تشارك؟
 
