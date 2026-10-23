@@ -49,7 +49,7 @@
 waslfy/
 ├── packages/parser/    ← waslfy-parser — npm package, zero deps, the core engine
 │   ├── src/            ← 5 extractors + normalization + data (27 governorates, city aliases)
-│   ├── test/           ← accuracy.test.ts + public corpus (40 real Egyptian messages)
+│   ├── test/           ← accuracy.test.ts (corpus accuracy + regression tests)
 │   └── demo/           ← CLI: npm run demo -- "الاسم: كريم - الجيزة - 01012345678"
 └── apps/web/           ← Next.js 16 + React 19 PWA shell (Inbox → Print → Excel → Backup)
 ```
@@ -61,7 +61,7 @@ git clone https://github.com/mohamed-khairy-5i/waslfy.git
 cd waslfy
 npm install
 
-# 1) Run the test suite (7 tests, 40-message corpus, live accuracy assertions)
+# 1) Run the test suite (10 tests: 40-message corpus accuracy + edge-case regressions)
 npm test
 
 # 2) Try the CLI demo

@@ -2,6 +2,15 @@
 
 All notable changes to Waslfy are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/), versioning follows [SemVer](https://semver.org/).
 
+## [0.1.1] — 2026-10
+
+### Fixed — parser (`waslfy-parser@0.1.1`)
+- **label-bleed**: bare labels with empty values (`الاسم:\nالتليفون:\nالعنوان:`) no longer leak the next label word as an extracted name — definite-article field keywords (`التليفون`، `الكود`، `المبلغ`…) added to STOPWORDS/FIELD_KEYWORDS, closing capture zones for name/address/amount alike
+- 3 regression tests added; corpus accuracy stays **40/40 (100%) on all five fields**
+
+### Changed — CI/CD
+- workflows: `npm ci` + npm cache everywhere; wrangler pinned to v4 in the Cloudflare Pages job (a transient Cloudflare 10500 flake had failed one deploy; token + project were verified healthy)
+
 ## [0.1.0] — 2026-10
 
 ### Added — parser (`waslfy-parser@0.1.0`)

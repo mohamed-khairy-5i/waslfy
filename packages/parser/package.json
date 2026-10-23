@@ -1,6 +1,6 @@
 {
   "name": "waslfy-parser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Extract Egyptian shipping/COD data from WhatsApp order text — zero dependencies, accuracy measured on a public corpus. استخراج بيانات الشحن المصرية من رسائل واتساب.",
   "type": "module",
   "main": "./dist/index.cjs",
