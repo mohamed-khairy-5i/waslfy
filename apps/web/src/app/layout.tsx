@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { SWRegister } from "@/components/waslfy/sw-register";
+
+/* Base path is baked at build time by the Pages deploy workflow. */
+const BP = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 const plexArabic = IBM_Plex_Sans_Arabic({
   variable: "--font-plex-arabic",
@@ -20,8 +24,15 @@ export const metadata: Metadata = {
     "محرك استخراج محلي يقرأ رسائل الطلبات المصرية ويحوّلها لإيصال شحن جاهز للطباعة — بدون سيرفر وبدون رفع بيانات. بيانات عملائك عمرها ما بتسيب جهازك.",
   keywords: ["Waslfy", "وصلّي", "استخراج بيانات", "شحن", "COD", "e-commerce", "parser", "open source"],
   authors: [{ name: "Waslfy" }],
+  manifest: `${BP}/manifest.webmanifest`,
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: `${BP}/icons/icon-192.png`,
+    apple: `${BP}/icons/apple-icon-180.png`,
+  },
+  appleWebApp: {
+    capable: true,
+    title: "وصلّي",
+    statusBarStyle: "black-translucent",
   },
   openGraph: {
     title: "وصلّي Waslfy — من رسالة واتساب لإيصال شحن",
@@ -47,6 +58,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
+        <SWRegister />
       </body>
     </html>
   );

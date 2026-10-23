@@ -24,6 +24,7 @@ All notable changes to Waslfy are documented here. Format based on [Keep a Chang
 - Backup/restore: JSON export + smart-merge import (newest-wins; stale backups can't clobber newer work).
 - Arabic normalized full-text search across all shipments.
 - UI v2: Cairo-paper identity (warm paper, pine green, amber), IBM Plex Sans Arabic, receipt-style extraction ticket with perforation, RTL-first, responsive down to 390px.
+- **Offline PWA (M5)**: installable via web manifest (RTL, standalone, maskable icon); hand-rolled path-safe service worker — network-first navigation with offline shell fallback, cache-first immutable `_next/static` assets and self-hosted fonts; amber "ثبّت التطبيق" pill via `beforeinstallprompt`; service worker registers in production builds only, so `next dev` stays cache-free.
 
 ### Metrics
 - Live accuracy on the public corpus: **100% on all five fields (40/40)** — address is low-confidence by design with informational extraction rate reported.

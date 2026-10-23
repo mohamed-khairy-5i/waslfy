@@ -22,6 +22,7 @@ import { Progress } from '@/components/ui/progress';
 import { FieldCard, CONFIDENCE_META, SOURCE_LABELS } from '@/components/waslfy/field-card';
 import { ShipmentList } from '@/components/waslfy/shipment-list';
 import { BackupCard } from '@/components/waslfy/backup-card';
+import { InstallButton } from '@/components/waslfy/install-button';
 import { addShipment, snapshotFromDraft, db } from '@/lib/waslfy/db';
 import { CORPUS, evaluateCorpus, overallAccuracy } from '@/lib/waslfy/accuracy';
 
@@ -98,6 +99,7 @@ export default function Home() {
           </div>
 
           <div className="ms-auto flex items-center gap-2">
+            <InstallButton />
             <div className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 backdrop-blur-sm">
               <span className="text-[15px] font-bold tabular-nums text-[#7fe0ae]">
                 {Math.round(overall.pct * 100)}%

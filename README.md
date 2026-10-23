@@ -38,6 +38,7 @@
 - **Print** — A6 packing slip with a real **Code128 barcode** (hand-rolled, zero deps) generated in-browser. Batch printing for all confirmed shipments. Blocked shipments show exactly what's missing.
 - **Export** — Excel with ready-made templates for Egyptian carriers + custom columns. Phone numbers exported as text (no `1.2E+10` nonsense).
 - **Backup** — one-click JSON export + smart merge import (newest record wins — a stale backup can never destroy newer work).
+- **Offline PWA** — install وصلّي as an app on phone/desktop: it boots and works with **zero network** (service worker + cached shell), data stays in IndexedDB.
 
 ## Monorepo layout / هيكل المشروع
 
@@ -124,7 +125,7 @@ Ran a real order the parser gets wrong? **Open an issue with the raw text (redac
 - [x] **M3** — A6 print + Code128 barcode + print-blocking gate
 - [x] **M4** — Excel export (carrier templates) + backup/restore with smart merge
 - [x] **UI v2** — Cairo-paper identity, receipt-style extraction ticket
-- [ ] **M5** — Offline PWA (installable, works with no network)
+- [x] **M5** — Offline PWA (installable, works with no network — hand-rolled service worker, no next-pwa dependency)
 - [ ] **M6** — Smart Mode (optional AI assist via server-side worker for the hard messages — still no data storage)
 - [ ] **M7** — npm publish + landing page + demo GIF
 
