@@ -1,0 +1,50 @@
+[
+  {
+    "id": "basic-1",
+    "category": "basic",
+    "text": "الاسم: أحمد محمد علي - العنوان: 15 شارع التحرير، الدقي، الجيزة - تليفون: 01001234567 - المبلغ: 350 جنيه",
+    "expected": { "name": "أحمد محمد علي", "phones": ["01001234567"], "governorate": "giza", "amount": 350, "addressContains": "التحرير" }
+  },
+  {
+    "id": "basic-2",
+    "category": "basic",
+    "text": "محمود سامي - 01223456789 - المنصورة شارع الترعة أمام المستشفى - كود 450",
+    "expected": { "name": "محمود سامي", "phones": ["01223456789"], "governorate": "dakahlia", "amount": 450, "addressContains": "الترعة" }
+  },
+  {
+    "id": "basic-3",
+    "category": "basic",
+    "text": "اسم العميل: سارة إبراهيم - العنوان: 8 ش الجامعة، المهندسين، الجيزة - الموبايل: 01012345678 - المبلغ المستحق: 500 ج",
+    "expected": { "name": "سارة إبراهيم", "phones": ["01012345678"], "governorate": "giza", "amount": 500, "addressContains": "الجامعة" }
+  },
+  {
+    "id": "basic-4",
+    "category": "basic",
+    "text": "01111111111 خالد فؤاد - مدينة نصر شارع عباس العقاد خلف بنك مصر - كاش 275 جنيه",
+    "expected": { "name": "خالد فؤاد", "phones": ["01111111111"], "governorate": "cairo", "amount": 275, "addressContains": "عباس العقاد" }
+  },
+  {
+    "id": "basic-5",
+    "category": "basic",
+    "text": "الاسم: نورهان عادل، العنوان: طنطا ش بسام، التليفون: 01276543210، التحصيل: 600",
+    "expected": { "name": "نورهان عادل", "phones": ["01276543210"], "governorate": "gharbia", "amount": 600, "addressContains": "بسام" }
+  },
+  {
+    "id": "basic-6",
+    "category": "basic",
+    "text": "علي حسن الشربيني / 31 ش بورسعيد الإسكندرية / 01033445566 / 1000 جنيه كود",
+    "expected": { "name": "علي حسن الشربيني", "phones": ["01033445566"], "governorate": "alexandria", "amount": 1000, "addressContains": "بورسعيد" }
+  },
+  {
+    "id": "basic-7",
+    "category": "basic",
+    "text": "اسم:- ياسمين خالد | عنوان:- فيصل ش الملك فيصل بلوك 6 | رقم:- 01555443322 | مبلغ:- 325",
+    "expected": { "name": "ياسمين خالد", "phones": ["01555443322"], "governorate": "giza", "amount": 325, "addressContains": "الملك فيصل" }
+  },
+  {
+    "id": "basic-8",
+    "category": "basic",
+    "text": "طلب جديد: عميل كريم مصطفى، سوهاج ش الشهيد، 01098765432، مبلغ 820 جنيه",
+    "expected": { "name": "كريم مصطفى", "phones": ["01098765432"], "governorate": "sohag", "amount": 820, "addressContains": "الشهيد" }
+  }
+]

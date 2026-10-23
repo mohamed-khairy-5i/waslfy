@@ -1,0 +1,44 @@
+[
+  {
+    "id": "mixed-1",
+    "category": "mixed-lang",
+    "text": "Name: Mostafa Kamel, Address: 10 El Nasr St, Nasr City, Cairo, Phone: 01011223344, COD: 450 EGP",
+    "expected": { "name": "Mostafa Kamel", "phones": ["01011223344"], "governorate": "cairo", "amount": 450, "addressContains": "El Nasr" }
+  },
+  {
+    "id": "mixed-2",
+    "category": "mixed-lang",
+    "text": "customer Ahmed Ali - Alex, Miami, street 14, mobile 01233445566, amount 700 جنيه",
+    "expected": { "name": "Ahmed Ali", "phones": ["01233445566"], "governorate": "alexandria", "amount": 700, "addressContains": "street" }
+  },
+  {
+    "id": "mixed-3",
+    "category": "mixed-lang",
+    "text": "الاسم: John Ibrahim - العنوان: 5 sh Abdel Aziz, وسط البلد، القاهرة - phone: 01099887766 - COD 150",
+    "expected": { "name": "John Ibrahim", "phones": ["01099887766"], "governorate": "cairo", "amount": 150, "addressContains": "Abdel Aziz" }
+  },
+  {
+    "id": "mixed-4",
+    "category": "mixed-lang",
+    "text": "Shipment for Hoda Saad, El Mansoura, sh El Gesh, 01110002000, cash 250",
+    "expected": { "name": "Hoda Saad", "phones": ["01110002000"], "governorate": "dakahlia", "amount": 250, "addressContains": "El Gesh" }
+  },
+  {
+    "id": "mixed-5",
+    "category": "mixed-lang",
+    "text": "اسم العميل Karim Adel، العنوان: smouha، الإسكندرية، رقم 01065000111، المبلغ 560 ج",
+    "expected": { "name": "Karim Adel", "phones": ["01065000111"], "governorate": "alexandria", "amount": 560, "addressContains": "smouha" }
+  },
+  {
+    "id": "mixed-6",
+    "category": "mixed-lang",
+    "text": "COD 300 - 01055004477 - Amal Fouad - دريم بارك، 6 اكتوبر، الجيزة",
+    "expected": { "name": "Amal Fouad", "phones": ["01055004477"], "governorate": "giza", "amount": 300, "addressContains": null }
+  },
+  {
+    "id": "mixed-7",
+    "category": "mixed-lang",
+    "text": "Menna Allah Tarek - 10th of Ramadan, El Sharkia - 01044332211 - 180 EGP كاش",
+    "expected": { "name": "Menna Allah Tarek", "phones": ["01044332211"], "governorate": "sharqia", "amount": 180, "addressContains": null }
+  }
+]

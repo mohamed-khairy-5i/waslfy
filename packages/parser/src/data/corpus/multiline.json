@@ -1,0 +1,32 @@
+[
+  {
+    "id": "multiline-1",
+    "category": "multiline",
+    "text": "السلام عليكم عايز أطلب\nالاسم: محمود السيد\nالعنوان: 15 شارع البحر دمنهور البحيرة\nالهاتف: 01012345678\nالمبلغ 350 جنيه كاش",
+    "expected": { "name": "محمود السيد", "phones": ["01012345678"], "governorate": "beheira", "amount": 350, "addressContains": "شارع البحر" }
+  },
+  {
+    "id": "multiline-2",
+    "category": "multiline",
+    "text": "أهلاً أنا نورهان عايزة طلبي يوصل بسرعة\nعنواني في مدينة نصر القاهرة 12 شارع عباس العقاد\nدا رقمي 01012349876\nالطلب هيبقى كاش 320 ج",
+    "expected": { "name": "نورهان", "phones": ["01012349876"], "governorate": "cairo", "amount": 320, "addressContains": "عباس العقاد" }
+  },
+  {
+    "id": "multiline-3",
+    "category": "multiline",
+    "text": "Name: Mohamed Ali\nAddress: Nasr City, Cairo - 9 Mostafa El Nahhas\nPhone: 01022334455\nCOD: 500 EGP",
+    "expected": { "name": "Mohamed Ali", "phones": ["01022334455"], "governorate": "cairo", "amount": 500, "addressContains": "Nasr City" }
+  },
+  {
+    "id": "multiline-4",
+    "category": "multiline",
+    "text": "الاسم: وليد سمير\nالعنوان: أسيوط شارع الهلالي عمارة ٣\nالموبايل: ٠١٠١٢٣٤٥٦٧٨\nالمطلوب ٤٥٠ جنيه",
+    "expected": { "name": "وليد سمير", "phones": ["01012345678"], "governorate": "asyut", "amount": 450, "addressContains": "الهلالي" }
+  },
+  {
+    "id": "multiline-5",
+    "category": "multiline",
+    "text": "السلام عليكم\nالاسم: هدى سمير\nدا رقمي 01066554433\nالمعادي القاهرة شارع 9",
+    "expected": { "name": "هدى سمير", "phones": ["01066554433"], "governorate": "cairo", "amount": null, "addressContains": "شارع 9" }
+  }
+]

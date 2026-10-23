@@ -1,0 +1,44 @@
+[
+  {
+    "id": "numerals-1",
+    "category": "arabic-numerals",
+    "text": "الاسم: هبة الله محمد - العنوان: شارع بورسعيد، المحلة الكبرى، الغربية - التليفون: ٠١٠٥٦٧٨١٢٣٤ - المبلغ: ٤٥٠ جنيه",
+    "expected": { "name": "هبة الله محمد", "phones": ["01056781234"], "governorate": "gharbia", "amount": 450, "addressContains": "بورسعيد" }
+  },
+  {
+    "id": "numerals-2",
+    "category": "arabic-numerals",
+    "text": "عبد الرحمن السيد ٠١٢٣٤٥٦٧٨٩٠ قنا ش الكرنك أمام البنك كود ٣٢٠",
+    "expected": { "name": "عبد الرحمن السيد", "phones": ["01234567890"], "governorate": "qena", "amount": 320, "addressContains": "الكرنك" }
+  },
+  {
+    "id": "numerals-3",
+    "category": "arabic-numerals",
+    "text": "مبلغ ٦٧٥ جنيه - العميل: صفاء مجدي - سوهاج طهطا ش الشهيد - ٠١١٢٢٣٣٤٤٥٥",
+    "expected": { "name": "صفاء مجدي", "phones": ["01122334455"], "governorate": "sohag", "amount": 675, "addressContains": "طهطا" }
+  },
+  {
+    "id": "numerals-4",
+    "category": "arabic-numerals",
+    "text": "التحصيل ٢٠٠ - ٠١٥٤٥٦٧٨٩٠٠ - مروة عادل - الإسكندرية العجمي البحر ش الغورية",
+    "expected": { "name": "مروة عادل", "phones": ["01545678900"], "governorate": "alexandria", "amount": 200, "addressContains": "العجمي" }
+  },
+  {
+    "id": "numerals-5",
+    "category": "arabic-numerals",
+    "text": "اسم العميل: طارق حسين، العنوان: بنها، القليوبية، ش الجيش، الهاتف: ٠١٠٤٥٦٧٨٩٠١، الكود: ١١٠٠",
+    "expected": { "name": "طارق حسين", "phones": ["01045678901"], "governorate": "qalyubia", "amount": 1100, "addressContains": "بنها" }
+  },
+  {
+    "id": "numerals-6",
+    "category": "arabic-numerals",
+    "text": "٩٥٠ كاش / العنوان: أسيوط ديروط ش النيل / ٠١٢٦٦٧٧٨٨٩٠ / الإسم: يسرا عبد الله",
+    "expected": { "name": "يسرا عبد الله", "phones": ["01266778890"], "governorate": "asyut", "amount": 950, "addressContains": "النيل" }
+  },
+  {
+    "id": "numerals-7",
+    "category": "arabic-numerals",
+    "text": "عميل: هاني عادل - المنصورة المشاية ش الترعة - ٠١٠٦٦٧٧٨٨٩٠ - المبلغ المستحق ٥٣٥",
+    "expected": { "name": "هاني عادل", "phones": ["01066778890"], "governorate": "dakahlia", "amount": 535, "addressContains": "الترعة" }
+  }
+]

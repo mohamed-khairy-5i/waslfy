@@ -1,104 +1,136 @@
 /**
- * Governorate extraction: alias dictionary → city/district map → fuzzy token match.
- * Returns suggestions in `alternatives` even when the main match fails.
+ * استخراج المحافظة — ثلاث طبقات:
+ * (1) مطابقة alias المحافظة نفسها → high
+ * (2) مطابقة مدينة/منطقة → medium
+ * (3) فازي-ماتش Levenshtein ≤ 1 → low (أخطاء كتابة)
+ * ذكية بخصوص الشوارع: "ش بورسعيد" ده اسم شارع — مش محافظة بورسعيد.
  */
-import type { Field, GovResult } from '../types';
-import { emptyField } from '../types';
-import { GOVERNORATES, CITY_TO_GOV, type Governorate } from '../data/governorates';
+import { Field, GovResult, mkField, emptyField } from '../types';
+import { Token, isLetters, STREET_MARKERS } from '../tokens';
 import { levenshtein } from '../levenshtein';
-import { AR_LETTER, prepare } from '../normalize';
+import { GOVERNORATES, GOV_BY_ID, Governorate } from '../data/governorates';
+import { CITY_TO_GOV, buildNameBlockSet } from '../data/cities';
+import { ExtractContext } from '../context';
 
-interface PreparedAlias {
-  alias: string;
+const WC = '[A-Za-z\\u0621-\\u064A0-9]';
+
+interface CompiledAlias {
+  re: RegExp;
   gov: Governorate;
-  kind: 'alias' | 'city';
+}
+interface CompiledCity {
+  re: RegExp;
+  govId: string;
 }
 
-const byLengthDesc = (a: PreparedAlias, b: PreparedAlias) =>
-  b.alias.length - a.alias.length;
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
-const ALIAS_INDEX: PreparedAlias[] = (() => {
-  const list: PreparedAlias[] = [];
+function compilePattern(pattern: string): RegExp {
+  return new RegExp(`(?<!${WC})${pattern}(?!${WC})`, 'g');
+}
+
+function aliasPattern(alias: string): string {
+  return alias.split(/\s+/).map(escapeRe).join('\\s*');
+}
+
+let govCache: CompiledAlias[] | null = null;
+let cityCache: CompiledCity[] | null = null;
+let aliasWords: Array<{ word: string; gov: Governorate }> | null = null;
+let nameBlockSet: Set<string> | null = null;
+
+function buildCaches(): void {
+  if (govCache) return;
+  govCache = [];
+  cityCache = [];
+  aliasWords = [];
   for (const gov of GOVERNORATES) {
-    for (const a of [gov.nameAr.replace(/[أإآ]/g, 'ا'), ...gov.aliases]) {
-      list.push({ alias: a, gov, kind: 'alias' });
+    for (const alias of gov.aliases) {
+      govCache.push({ re: compilePattern(aliasPattern(alias)), gov });
+      for (const w of alias.split(/\s+/)) {
+        aliasWords.push({ word: w, gov });
+      }
     }
   }
   for (const [city, govId] of Object.entries(CITY_TO_GOV)) {
-    const gov = GOVERNORATES.find((g) => g.id === govId);
-    if (gov) list.push({ alias: city, gov, kind: 'city' });
+    cityCache.push({ re: compilePattern(aliasPattern(city)), govId });
   }
-  return list.sort(byLengthDesc);
-})();
-
-const GOV_BY_ID = new Map(GOVERNORATES.map((g) => [g.id, g]));
-
-function boundaryRegex(alias: string): RegExp {
-  const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(
-    `(?<!${AR_LETTER}|[a-z0-9])${escaped}(?!${AR_LETTER}|[a-z0-9])`
-  );
+  nameBlockSet = buildNameBlockSet();
 }
 
-export function extractGovernorate(raw: string): Field<GovResult> {
-  const text = prepare(raw);
-  // 1) exact alias / city hits (longest first)
-  for (const { alias, gov, kind } of ALIAS_INDEX) {
-    if (boundaryRegex(alias).test(text)) {
-      return {
-        value: { id: gov.id, nameAr: gov.nameAr, matchedBy: kind },
-        confidence: 'high',
-        source: kind === 'city' ? 'city-map' : 'dictionary'
-      };
-    }
-  }
-
-  // 2) fuzzy token match (typos) — only for aliases long enough to be safe
-  const tokens = text.split(new RegExp(`[^\\u0621-\\u064Aa-z0-9]+`)).filter(Boolean);
-  const fuzzyHits: Array<{ gov: Governorate; dist: number }> = [];
-  for (const tok of tokens) {
-    if (tok.length < 4) continue;
-    for (const { alias, gov } of ALIAS_INDEX) {
-      if (alias.length < 5 || /[a-z]/.test(alias)) continue;
-      const dist = levenshtein(tok, alias);
-      if (dist <= (alias.length >= 7 ? 2 : 1)) {
-        fuzzyHits.push({ gov, dist });
+/** لو التوكِن اللي قبل المكان مباشرةً علامة شارع → دي شارع مش محافظة. */
+function isStreetMarked(tokens: Token[], matchStart: number): boolean {
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    if (t.end >= matchStart) {
+      if (i > 0) {
+        const p = tokens[i - 1];
+        if (matchStart - p.end <= 2 && STREET_MARKERS.has(p.text)) return true;
       }
+      return false;
     }
   }
-  fuzzyHits.sort((a, b) => a.dist - b.dist);
-  const best = fuzzyHits[0];
-  if (best) {
-    const altGovs = fuzzyHits
-      .slice(1, 4)
-      .filter((h) => h.gov.id !== best.gov.id)
-      .map((h) => ({ id: h.gov.id, nameAr: h.gov.nameAr, matchedBy: 'fuzzy' as const }));
-    const f: Field<GovResult> = {
-      value: { id: best.gov.id, nameAr: best.gov.nameAr, matchedBy: 'fuzzy' },
-      confidence: 'medium',
-      source: 'fuzzy'
-    };
-    if (altGovs.length > 0) f.alternatives = altGovs;
-    return f;
-  }
+  return false;
+}
 
-  // 3) nothing — but still offer the closest 3 as suggestions for the UI
-  const suggestions: GovResult[] = [];
-  for (const { alias, gov } of ALIAS_INDEX) {
-    if (/[a-z]/.test(alias) || alias.length < 4) continue;
-    for (const tok of tokens) {
-      if (levenshtein(tok, alias) <= 3) {
-        if (!suggestions.some((s) => s.id === gov.id)) {
-          suggestions.push({ id: gov.id, nameAr: gov.nameAr, matchedBy: 'fuzzy' });
-        }
-        break;
-      }
+function firstValidMatch(re: RegExp, s: string, tokens: Token[]): RegExpExecArray | null {
+  re.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(s))) {
+    if (!isStreetMarked(tokens, m.index)) return m;
+    if (m.index === re.lastIndex) re.lastIndex++;
+  }
+  return null;
+}
+
+function tryFuzzy(tokens: Token[]): Governorate | null {
+  for (const t of tokens) {
+    if (!isLetters(t.text) || t.text.length < 5) continue;
+    const stripped =
+      t.text.startsWith('ال') && t.text.length >= 6 ? t.text.slice(2) : t.text;
+    for (const { word, gov } of aliasWords!) {
+      if (word.length < 5) continue;
+      if (levenshtein(stripped, word) <= 1) return gov;
+      const wStrip =
+        word.startsWith('ال') && word.length >= 6 ? word.slice(2) : word;
+      if (wStrip.length >= 5 && levenshtein(stripped, wStrip) <= 1) return gov;
     }
-    if (suggestions.length >= 3) break;
   }
-  return emptyField<GovResult>('dictionary', suggestions);
+  return null;
 }
 
-export function govNameById(id: string): string | undefined {
-  return GOV_BY_ID.get(id)?.nameAr;
+export function extractGovernorateCore(ctx: ExtractContext): Field<GovResult | null> {
+  buildCaches();
+  const s = ctx.n.search;
+  const tokens = ctx.tokens;
+
+  // 1) المحافظة بالاسم المباشر
+  for (const { re, gov } of govCache!) {
+    if (firstValidMatch(re, s, tokens)) {
+      return mkField({ id: gov.id, name: gov.name }, 'high', 'dictionary');
+    }
+  }
+
+  // 2) مدينة/منطقة جوه محافظة
+  for (const { re, govId } of cityCache!) {
+    if (firstValidMatch(re, s, tokens)) {
+      const gov = GOV_BY_ID[govId];
+      if (gov) return mkField({ id: gov.id, name: gov.name }, 'medium', 'dictionary');
+    }
+  }
+
+  // 3) فازي — خطأ كتابة بسيط
+  const fz = tryFuzzy(tokens);
+  if (fz) return mkField({ id: fz.id, name: fz.name }, 'low', 'dictionary');
+
+  return emptyField<GovResult | null>(null, 'dictionary');
 }
+
+/** بتستخدم في name.ts — توكِنات أسماء الأماكن ممنوع تُحسب أسماء أشخاص. */
+export function isNameBlockedToken(t: string): boolean {
+  buildCaches();
+  return nameBlockSet!.has(t);
+}
+
+export { GOVERNORATES, GOV_BY_ID, CITY_TO_GOV };

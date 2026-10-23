@@ -1,0 +1,50 @@
+[
+  {
+    "id": "dialect-1",
+    "category": "dialect",
+    "text": "الزبر يا ست الشباب عايز يوصل للمندوب: اسمه مصطفى كامل، هو اقعد في المعادي القاهرة، رقمه 01067891234، الفلوس اللي هتتحصل 475",
+    "expected": { "name": "مصطفى كامل", "phones": ["01067891234"], "governorate": "cairo", "amount": 475, "addressContains": null }
+  },
+  {
+    "id": "dialect-2",
+    "category": "dialect",
+    "text": "العميلة دعاء سمير مكانها في بورسعيد ش جمال عبد الناصر جنب الصيدلية، كلمني على 01223344556، هتدفع 300 ج",
+    "expected": { "name": "دعاء سمير", "phones": ["01223344556"], "governorate": "portsaid", "amount": 300, "addressContains": "جمال عبد الناصر" }
+  },
+  {
+    "id": "dialect-3",
+    "category": "dialect",
+    "text": "ابعتله لعمر ياسر في اسيوط ش صوامل القناطر، تليفون الشباب 01144556677، كاش 150",
+    "expected": { "name": "عمر ياسر", "phones": ["01144556677"], "governorate": "asyut", "amount": 150, "addressContains": "صوامل" }
+  },
+  {
+    "id": "dialect-4",
+    "category": "dialect",
+    "text": "حاجة هتبعتها للسيدة ريم فتحي في دمنهور البحيرة ش البحر، رقمها 01088776655، المبلغ 990",
+    "expected": { "name": "ريم فتحي", "phones": ["01088776655"], "governorate": "beheira", "amount": 990, "addressContains": "البحر" }
+  },
+  {
+    "id": "dialect-5",
+    "category": "dialect",
+    "text": "شحنه لحسن علي: زقازيق الشرقية ش القومية قدام المحطة، موبايل 01277889900، كود 640 ج",
+    "expected": { "name": "حسن علي", "phones": ["01277889900"], "governorate": "sharqia", "amount": 640, "addressContains": "القومية" }
+  },
+  {
+    "id": "dialect-6",
+    "category": "dialect",
+    "text": "الزبون أحمد الشناوي، عايش في أسوان ش عبد الإله التايب، رقم موبايله 01155667788، هيسدد 220",
+    "expected": { "name": "أحمد الشناوي", "phones": ["01155667788"], "governorate": "aswan", "amount": 220, "addressContains": "عبد الإله" }
+  },
+  {
+    "id": "dialect-7",
+    "category": "dialect",
+    "text": "بعتولي العنوان ده: فيسا - الفيوم - ش الجيش بجوار المستشفى، المريضة اسمها سلمى طارق، رقمها 01033221100، عليا 380 ج",
+    "expected": { "name": "سلمى طارق", "phones": ["01033221100"], "governorate": "fayoum", "amount": 380, "addressContains": "الجيش" }
+  },
+  {
+    "id": "dialect-8",
+    "category": "dialect",
+    "text": "طلبيه جديده للعميل محمد رمضان في العاشر من رمضان الشرقية، ت 01012309876، كاش 1250",
+    "expected": { "name": "محمد رمضان", "phones": ["01012309876"], "governorate": "sharqia", "amount": 1250, "addressContains": null }
+  }
+]

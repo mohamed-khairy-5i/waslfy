@@ -1,0 +1,62 @@
+[
+  {
+    "id": "live-1",
+    "category": "live",
+    "text": "الاسم: محمود علي - التليفون: 01001234567 - الجيزة - 12 شارع جامعة الدول العربية المهندسين - كود 450 جنيه",
+    "expected": {
+      "name": "محمود علي",
+      "phones": ["01001234567"],
+      "governorate": "giza",
+      "amount": 450,
+      "addressContains": "جامعة الدول"
+    }
+  },
+  {
+    "id": "live-2",
+    "category": "live",
+    "text": "يا باشا ابعت البضاعة لحسن علي في طنطا، رقمه 01066677888، كود 250 جنيه",
+    "expected": {
+      "name": "حسن علي",
+      "phones": ["01066677888"],
+      "governorate": "gharbia",
+      "amount": 250,
+      "addressContains": null
+    }
+  },
+  {
+    "id": "live-3",
+    "category": "live",
+    "text": "عندى طلب اسمه مصطفى سيد، تليفونه ٠١٢٣٤٥٦٧٨٩٠، هوة في اسكندرانيه، كود الف جنيه",
+    "expected": {
+      "name": "مصطفى سيد",
+      "phones": ["01234567890"],
+      "governorate": "alexandria",
+      "amount": 1000,
+      "addressContains": null
+    }
+  },
+  {
+    "id": "live-4",
+    "category": "live",
+    "text": "الطلب ده للسيد محمد السيد في العبور القليوبية، اتصل على 01122334455، هتدفع 750",
+    "expected": {
+      "name": "محمد السيد",
+      "phones": ["01122334455"],
+      "governorate": "qalyubia",
+      "amount": 750,
+      "addressContains": null
+    }
+  },
+  {
+    "id": "live-5",
+    "category": "live",
+    "text": "Customer Name: Youssef Elsayed, phone +20 100 555 6677, Nasr City Cairo, COD 950 EGP",
+    "expected": {
+      "name": "Youssef Elsayed",
+      "phones": ["01005556677"],
+      "governorate": "cairo",
+      "amount": 950,
+      "addressContains": null
+    }
+  }
+]

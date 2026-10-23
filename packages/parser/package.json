@@ -1,7 +1,7 @@
 {
   "name": "waslfy-parser",
   "version": "0.1.0",
-  "description": "Zero-dependency extraction engine for Egyptian e-commerce order messages (Arabic/Egyptian dialect) — name, phones, governorate, address, COD amount.",
+  "description": "Extract Egyptian shipping/COD data from WhatsApp order text — zero dependencies, accuracy measured on a public corpus. استخراج بيانات الشحن المصرية من رسائل واتساب.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -13,12 +13,49 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
-  "keywords": ["arabic", "nlp", "egypt", "shipping", "extraction", "cod", "order"],
-  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
   "scripts": {
+    "build": "tsup",
     "test": "vitest run",
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "demo": "tsx demo/cli.ts"
+    "demo": "tsup && node dist/cli.js"
+  },
+  "keywords": [
+    "egypt",
+    "egyptian-arabic",
+    "shipping",
+    "cod",
+    "cash-on-delivery",
+    "arabic",
+    "arabic-nlp",
+    "whatsapp",
+    "parser",
+    "extractor",
+    "ecommerce",
+    "logistics"
+  ],
+  "author": "Waslfy contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/waslfy/waslfy.git",
+    "directory": "packages/parser"
+  },
+  "bugs": {
+    "url": "https://github.com/waslfy/waslfy/issues"
+  },
+  "homepage": "https://github.com/waslfy/waslfy#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
   }
 }

@@ -1,0 +1,34 @@
+name: Publish parser to npm
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # انشر فقط لو الـ release عليه tag v* والحزمة فعلاً اتغيرت
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - run: npm install
+      - run: npm test
+      - run: npm run build
+      - name: Publish if version changed
+        working-directory: packages/parser
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          NPM_VERSION=$(npm view waslfy-parser version 2>/dev/null || echo "none")
+          if [ "$PKG_VERSION" = "$NPM_VERSION" ]; then
+            echo "waslfy-parser@$PKG_VERSION منشورة بالفعل — تخطي"
+          else
+            npm publish
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

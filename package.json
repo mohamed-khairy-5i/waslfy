@@ -1,22 +1,22 @@
 {
   "name": "waslfy",
-  "private": true,
   "version": "0.1.0",
+  "private": true,
+  "description": "Waslfy وصلّي — استخراج بيانات الشحن المصرية من رسائل واتساب، local-first",
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "demo": "tsx packages/parser/demo/cli.ts",
-    "build": "npm run build -w packages/parser"
+    "test": "npm run test -w waslfy-parser",
+    "build": "npm run build -w waslfy-parser",
+    "demo": "npm run demo -w waslfy-parser",
+    "web:dev": "npm run dev -w apps/web",
+    "web:build": "npm run build -w apps/web",
+    "web:lint": "npm run lint -w apps/web"
   },
-  "devDependencies": {
-    "@types/node": "^26.6.4",
-    "tsup": "^8.5.1",
-    "tsx": "^4.19.0",
-    "typescript": "^5.6.0",
-    "vitest": "^3.0.0"
+  "engines": {
+    "node": ">=18"
   }
 }

@@ -1,5 +1,23 @@
+# dependencies & builds
 node_modules/
 dist/
+.next/
+out/
+*.tsbuildinfo
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# logs & OS noise
 *.log
 .DS_Store
-.wrangler/
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+
+# local archives (release zips live outside the repo)
+*.zip

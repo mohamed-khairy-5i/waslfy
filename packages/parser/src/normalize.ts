@@ -1,111 +1,97 @@
 /**
- * Arabic text normalization utilities.
- * Idempotent: normalize(normalize(x)) === normalize(x) — safe to run multiple times.
+ * تطبيع النص العربي — بيدوم طوله 1:1 مع النص الأصلي قدر الإمكان
+ * (عن طريق map من index التطبيع إلى index الأصلي) عشان نقدر نرجّع
+ * القيم المستخرَجة بالرسم الأصلي زي ما العميل كتبها.
+ *
+ * ملاحظة مهمة: ى متبيتحولش لـ ي — عشان "على" (حرف جر) تفضل مختلفة
+ * عن "علي" (اسم علم) — ودي حاجة بتفرق فعلاً في أسماء العملاء.
  */
 
-const ARABIC_INDIC = '٠١٢٣٤٥٦٧٨٩';
-const PERSIAN_INDIC = '۰۱۲۳۴۵۶۷۸۹';
-
-/** Convert Arabic-Indic (٠-٩) and Persian (۰-۹) digits to Latin (0-9). */
-export function toLatinDigits(s: string): string {
-  return s.replace(/[\u0660-\u0669\u06F0-\u06F9]/g, (d) => {
-    const ai = ARABIC_INDIC.indexOf(d);
-    if (ai !== -1) return String(ai);
-    return String(PERSIAN_INDIC.indexOf(d));
-  });
+export interface NormalizedText {
+  /** النص بعد التطبيع — ده اللي بنعمل عليه البحث */
+  search: string;
+  /** map[i] = index الحرف في النص الأصلي */
+  map: number[];
+  /** النص الأصلي زي ما هو */
+  original: string;
 }
 
-/**
- * Normalize Arabic letters for matching (NOT for display):
- * - remove tashkeel + tatweel
- * - remove zero-width chars and RTL/LTR control marks (very common in chat text!)
- * - unify hamza forms, taa marbouta, alef maqsura, ya/hamza carriers
- */
-export function normalizeArabicLetters(s: string): string {
-  return s
-    // tashkeel + tatweel + superscript alef
-    .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
-    // zero-width chars + bidi embedding/override marks
-    .replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '')
-    .replace(/[أإآٱ]/g, 'ا')
-    .replace(/ى/g, 'ي')
-    .replace(/ة/g, 'ه')
-    .replace(/ؤ/g, 'و')
-    .replace(/ئ/g, 'ي');
+const TASHKEEL_RE = /[\u064B-\u065F\u0670\u0640]/;
+// zero-width + علامات الاتجاه RTL/LTR — شائعة جداً في رسائل واتساب
+const INVISIBLE_RE = /[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/;
+
+const CHAR_MAP: Record<string, string> = {
+  'أ': 'ا',
+  'إ': 'ا',
+  'آ': 'ا',
+  'ٱ': 'ا',
+  'ؤ': 'و',
+  'ئ': 'ي',
+  'ة': 'ه',
+  '،': ',',
+  '؛': ';',
+  '؟': '?',
+  '–': '-',
+  '—': '-',
+  '−': '-',
+  '\u00A0': ' ',
+  'گ': 'ك',
+  'چ': 'ج',
+  'پ': 'ب',
+  'ژ': 'ز',
+};
+
+const ARABIC_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+const PERSIAN_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+
+function mapChar(ch: string): string | null {
+  if (TASHKEEL_RE.test(ch) || INVISIBLE_RE.test(ch)) return null;
+  const mapped = CHAR_MAP[ch];
+  if (mapped !== undefined) return mapped === '' ? null : mapped;
+  const ai = ARABIC_DIGITS.indexOf(ch);
+  if (ai >= 0) return String(ai);
+  const pi = PERSIAN_DIGITS.indexOf(ch);
+  if (pi >= 0) return String(pi);
+  return ch.toLowerCase();
 }
 
-/**
- * Full "keep structure" normalization used to prepare a message once before extraction:
- * letters unified, digits latin, latin lowercased, spaces/tabs collapsed, newlines kept.
- */
-export function prepare(raw: string): string {
-  return toLatinDigits(normalizeArabicLetters(raw ?? ''))
-    .toLowerCase()
-    .replace(/[ \t\u00A0]+/g, ' ');
-}
-
-/** For side-by-side comparison in tests/reports (also collapses newlines). */
-export function loose(s: string): string {
-  return prepare(s).replace(/\n+/g, ' ').trim();
-}
-
-/**
- * Build the prepared (normalized) form of `raw` together with a char map from
- * prepared indices back to raw indices. The prepared output is IDENTICAL to
- * prepare(raw) — the map is what lets us recover original casing/spans.
- */
-export function buildCaseMap(raw: string): { prepared: string; map: number[] } {
-  const src = raw ?? '';
-  let prepared = '';
+export function normalizeText(original: string): NormalizedText {
+  let search = '';
   const map: number[] = [];
-  let inSpace = false;
+  const src = original ?? '';
   for (let i = 0; i < src.length; i++) {
-    let ch = src[i];
-    // deletions: tashkeel, tatweel, superscript alef, zero-width + bidi marks
-    if (/[\u064B-\u065F\u0670\u0640\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/.test(ch)) continue;
-    // 1:1 letter unification (same rules as normalizeArabicLetters)
-    if ('أإآٱ'.includes(ch)) ch = 'ا';
-    else if (ch === 'ى') ch = 'ي';
-    else if (ch === 'ة') ch = 'ه';
-    else if (ch === 'ؤ') ch = 'و';
-    else if (ch === 'ئ') ch = 'ي';
-    else {
-      const ai = ARABIC_INDIC.indexOf(ch);
-      if (ai !== -1) ch = String(ai);
-      else {
-        const pi = PERSIAN_INDIC.indexOf(ch);
-        if (pi !== -1) ch = String(pi);
-      }
-    }
-    // space collapse (same class as prepare)
-    if (ch === ' ' || ch === '\t' || ch === '\u00A0') {
-      if (inSpace) continue;
-      inSpace = true;
-      ch = ' ';
-    } else {
-      inSpace = false;
-    }
-    prepared += ch.toLowerCase();
+    const out = mapChar(src[i]);
+    if (out === null) continue;
+    search += out;
     map.push(i);
   }
-  return { prepared, map };
+  return { search, map, original: src };
 }
 
-/**
- * Given a value extracted from prepare(raw), return the corresponding slice of
- * the ORIGINAL text — so Latin names/addresses keep their original casing and
- * displayed values never look mangled. Falls back to the prepared value when
- * the exact slice can't be located (e.g. after aggressive cleanup).
- */
-export function restoreCase(raw: string, value: string): string {
-  if (!value) return value;
-  const { prepared, map } = buildCaseMap(raw);
-  const start = prepared.indexOf(value);
-  if (start === -1) return value;
-  const rawStart = map[start];
-  const rawEnd = map[start + value.length - 1] + 1;
-  return (raw ?? '').slice(rawStart, rawEnd);
+/** بيرجّع الجزء المقابل من النص الأصلي (بالرسم الأصلي). */
+export function originalSpan(
+  n: NormalizedText,
+  start: number,
+  end: number,
+  source?: string
+): string {
+  if (end <= start || n.map.length === 0) return '';
+  const s = Math.max(0, Math.min(start, n.map.length - 1));
+  const e = Math.max(0, Math.min(end - 1, n.map.length - 1));
+  if (e < s) return '';
+  const base = source ?? n.original;
+  return base.slice(n.map[s], n.map[e] + 1);
 }
 
-/** Arabic letter class used for word-boundary lookarounds. */
+/** تطبيع مبسّط للمقارنات (في الاختبارات والتقارير) — بدون map. */
+export function normalizeSimple(s: string): string {
+  let out = '';
+  for (const ch of s ?? '') {
+    const c = mapChar(ch);
+    if (c !== null) out += c;
+  }
+  return out;
+}
+
+/** كلاس الحروف العربية للـ lookarounds. */
 export const AR_LETTER = '[\\u0621-\\u064A]';

@@ -1,42 +1,52 @@
 /**
- * Core types of the extraction engine.
- * Every field returns { value, confidence, source, alternatives? } — never a silent guess.
+ * أنواع الواجهة العامة لـ waslfy-parser.
+ * كل حقل بيرجع Field<T> — القيمة + درجة الثقة + مصدر الاستخراج.
+ * قاعدة ذهبية: مفيش قيم صامتة — confidence 'empty' يعني "اسأل التاجر، متخمنش".
  */
 
 export type Confidence = 'high' | 'medium' | 'low' | 'empty';
-
-/** For collection fields (phones: string[]), alternatives are single elements (string). */
-export type ElementOf<T> = T extends Array<infer U> ? U : T;
+export type Source = 'regex' | 'dictionary' | 'context' | 'user' | 'smart-ai';
 
 export interface Field<T> {
-  /** Extracted value, or null when nothing reliable was found. */
-  value: T | null;
+  value: T;
   confidence: Confidence;
-  /** How the value was found: regex | dictionary | city-map | fuzzy | pattern | context | user | smart-ai */
-  source: string;
-  /** Other plausible candidates at element level (e.g. secondary phone numbers). */
-  alternatives?: ElementOf<T>[];
+  source: Source;
+  alternatives?: T;
+  confirmed: boolean;
 }
 
 export interface GovResult {
-  /** Governorate id, e.g. "cairo", "dakahlia". */
   id: string;
-  /** Official Arabic name, e.g. "الدقهلية". */
-  nameAr: string;
-  /** Which mechanism matched: alias | city | fuzzy */
-  matchedBy: 'alias' | 'city' | 'fuzzy';
+  name: string;
 }
 
-export interface ShipmentDraft {
+export interface ShipmentFields {
   name: Field<string>;
   phones: Field<string[]>;
-  governorate: Field<GovResult>;
+  governorate: Field<GovResult | null>;
   address: Field<string>;
-  amount: Field<number>;
+  amount: Field<number | null>;
 }
 
-export function emptyField<T>(source: string, alternatives?: ElementOf<T>[]): Field<T> {
-  const f: Field<T> = { value: null, confidence: 'empty', source };
-  if (alternatives && alternatives.length > 0) f.alternatives = alternatives;
+/** ترتيب الثقة — بيستخدم في حجب الطباعة لو في حقول ناقصة. */
+export const CONFIDENCE_ORDER: Record<Confidence, number> = {
+  empty: 0,
+  low: 1,
+  medium: 2,
+  high: 3,
+};
+
+export function mkField<T>(
+  value: T,
+  confidence: Confidence,
+  source: Source,
+  alternatives?: T
+): Field<T> {
+  const f: Field<T> = { value, confidence, source, confirmed: false };
+  if (alternatives !== undefined) f.alternatives = alternatives;
   return f;
+}
+
+export function emptyField<T>(fallback: T, source: Source = 'regex'): Field<T> {
+  return { value: fallback, confidence: 'empty', source, confirmed: false };
 }

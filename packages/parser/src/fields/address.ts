@@ -1,54 +1,86 @@
 /**
- * Address extraction — by product decision this is the least trusted field:
- * labeled addresses get medium, unlabeled segments get low, and anything
- * the parser can't anchor stays empty for the seller to fill manually.
+ * استخراج العنوان — دايماً low confidence بالتصميم (العنوان العربي محتاج مراجعة بشرية).
+ * (1) label صريح "العنوان/address:" — بيسمح بالأرقام والدشات جوه العنوان
+ * (2) fallback: أول مقطع فيه كلمة شارع/عمارة/بلوك...
  */
-import type { Field } from '../types';
-import { emptyField } from '../types';
-import { prepare, restoreCase } from '../normalize';
+import { Field, mkField, emptyField } from '../types';
+import { Token, STREET_KEYWORDS, FIELD_KEYWORDS, STOPWORDS } from '../tokens';
+import { originalSpan } from '../normalize';
+import { ExtractContext } from '../context';
 
-const ADDRESS_LABEL =
-  '(?:العنوان|عنواني|عنوان|عنوان البنايه|عنوان التسليم|address|addr)';
+const WC = `[A-Za-z\\u0621-\\u064A]`;
+const LABEL_RE = new RegExp(
+  `(?<!${WC})(?:العنوان|عنواني|عنوان|address|addr)(?!${WC})(?:\\s+(?:ده|دي|هو))?\\s*[:=\\-]*\\s*`,
+  'g'
+);
 
-const ADDRESS_STOP =
-  'هاتف|تليفون|موبايل|واتساب|واتس|whatsapp|mobile|phone|tel|رقم|مبلغ|كاش|جنيه|الاجمالي|cod|اسم|name';
-
-const ADDRESS_ANCHORS =
-  'شارع|عماره|عمارة|دور|شقه|شقة|حي|بلوك|فيلا|قدام|أمام|امام|جنب|خلف|مسجد|محطه|محطة|مدرسه|مدرسة|مستشفي|مستشفى|بنك|كافيه|كافيه|نادي|دوار|برج|امتداد|منطقه|منطقة|ساكن|ساكنه|مقيم|المنزل|عمارة|عقار|شارع|فوق|تحت';
-
-function cutAtStop(s: string): string {
-  // word-boundary safe: "الاسماعيليه" must NOT be cut by the stop word "اسم"
-  const re = new RegExp(
-    `(?<![\\u0621-\\u064Aa-z0-9])(?:${ADDRESS_STOP})(?![\\u0621-\\u064Aa-z0-9])[\\s\\S]*$`,
-    'i'
-  );
-  return s.replace(re, '').replace(/\s+/g, ' ').trim();
-}
-
-export function extractAddress(raw: string): Field<string> {
-  const text = prepare(raw);
-  // 1) labeled: "العنوان: ..." — value is what the seller explicitly marked
-  const labeled = new RegExp(`${ADDRESS_LABEL}\\s*[:：]?\\s*([^\\n]+)`, 'i').exec(text);
-  if (labeled && labeled[1]) {
-    const v = cutAtStop(labeled[1]);
-    if (v.length >= 4) {
-      return { value: restoreCase(raw, v), confidence: 'medium', source: 'pattern:labeled' };
+/** العنوان بيسمح بالأرقام — الدش بيقفل الالتقاط بس لو بعده حقل تاني (مثل "- تليفون:"). */
+function captureAddressEnd(s: string, tokens: Token[], from: number): number {
+  const limit = Math.min(s.length, from + 120);
+  let end = limit;
+  for (let i = from; i < limit; i++) {
+    const ch = s[i];
+    if (ch === ',' || ch === '|' || ch === ';' || ch === '\n' || ch === '/') { end = i; break; }
+    if (ch === '-') {
+      const tm = /^\s*([A-Za-z\u0621-\u064A0-9]+)/.exec(s.slice(i + 1, i + 25));
+      if (tm && FIELD_KEYWORDS.has(tm[1])) { end = i; break; }
     }
   }
+  for (const t of tokens) {
+    if (t.end <= from) continue;
+    if (t.start >= end) break;
+    if (t.start > from && FIELD_KEYWORDS.has(t.text)) { end = Math.min(end, t.start); break; }
+  }
+  return end;
+}
 
-  // 2) anchor words inside a line (street/mosque/landmark vocabulary)
-  const anchorRe = new RegExp(`(?:${ADDRESS_ANCHORS})`);
-  for (const line of text.split('\n')) {
-    const l = line.trim();
-    if (!l || l.length < 6) continue;
-    if (/^(?:السلام عليكم|سلام|مساء الخير|صباح الخير)/i.test(l)) continue;
-    if (anchorRe.test(l)) {
-      const v = cutAtStop(l);
-      if (v.length >= 4) {
-        return { value: restoreCase(raw, v), confidence: 'low', source: 'context:anchors' };
-      }
-    }
+export function extractAddressCore(ctx: ExtractContext): Field<string> {
+  const s = ctx.n.search;
+
+  // 1) label صريح
+  LABEL_RE.lastIndex = 0;
+  const m = LABEL_RE.exec(s);
+  if (m) {
+    const from = m.index + m[0].length;
+    const to = captureAddressEnd(s, ctx.tokens, from);
+    const value = originalSpan(ctx.n, from, to, ctx.masked).replace(/\s+/g, ' ').trim();
+    if (value.length > 0) return mkField(value, 'low', 'regex');
   }
 
-  return emptyField<string>('none');
+  // 2) fallback: إبدا من كلمة الشارع نفسها + الرقم/المدينة اللي قبلها،
+  //    ووقف عند الموبايل/الشرطة/كلمة حقل — عشان العنوان ميحملش اسم العميل.
+  const segs = segmentRanges(s);
+  for (const seg of segs) {
+    const segTokens: Token[] = ctx.tokens.filter(
+      (t) => t.start >= seg.start && t.end <= seg.end
+    );
+    const kwIdx = segTokens.findIndex((t) => STREET_KEYWORDS.has(t.text));
+    if (kwIdx === -1) continue;
+
+    let fromIdx = kwIdx;
+    let i = kwIdx;
+    while (i > 0) {
+      const p = segTokens[i - 1];
+      // رقم موبايل = حاجز
+      const isPhone = ctx.phones.ranges.some((r) => p.start < r.end && p.end > r.start);
+      if (isPhone) break;
+      // شرطة/فاصل بين التوكِنين = حاجز ("الجيزة - 12 شارع X")
+      const between = s.slice(p.end, segTokens[i].start);
+      if (between.includes('-') || /[,|;\/]/.test(between)) break;
+      if (STOPWORDS.has(p.text) || FIELD_KEYWORDS.has(p.text)) break;
+      fromIdx = i - 1;
+      i -= 1;
+    }
+
+    const from = segTokens[fromIdx].start;
+    const to = captureAddressEnd(s, ctx.tokens, from);
+    const value = originalSpan(ctx.n, from, to, ctx.masked)
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (value.length > 0) return mkField(value, 'low', 'context');
+  }
+
+  return emptyField<string>('', 'context');
 }
+
+import { segmentRanges } from '../tokens';

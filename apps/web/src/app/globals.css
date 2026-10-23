@@ -1,0 +1,272 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plex-arabic);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ===== هوية «وصلّي» — ورق قاهراوي دافي + أخضر صنوبري + عنبري ===== */
+:root {
+  --radius: 1rem;
+  --background: #f6f4ee;
+  --foreground: #17251f;
+  --card: #ffffff;
+  --card-foreground: #17251f;
+  --popover: #ffffff;
+  --popover-foreground: #17251f;
+  --primary: #0c5c42;
+  --primary-foreground: #f2fbf6;
+  --secondary: #ebe7dc;
+  --secondary-foreground: #23362c;
+  --muted: #eceadf;
+  --muted-foreground: #6f7a70;
+  --accent: #e5efe7;
+  --accent-foreground: #0c5c42;
+  --destructive: #b3402a;
+  --border: #e2ded1;
+  --input: #dcd8ca;
+  --ring: #0c5c42;
+  --chart-1: #0c5c42;
+  --chart-2: #c97b10;
+  --chart-3: #2c7a5b;
+  --chart-4: #8a6d3b;
+  --chart-5: #4d7c6f;
+  --sidebar: #0c3b2e;
+  --sidebar-foreground: #e8f0ea;
+  --sidebar-primary: #2c7a5b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #134636;
+  --sidebar-accent-foreground: #e8f0ea;
+  --sidebar-border: #1c5140;
+  --sidebar-ring: #2c7a5b;
+
+  /* درجات مساعدة بره نظام التوكنز */
+  --w-pine: #0c3b2e;
+  --w-pine-2: #11493a;
+  --w-amber: #c97b10;
+  --w-amber-soft: #f5e7cf;
+  --w-line: #e2ded1;
+}
+
+.dark {
+  --background: #0d1611;
+  --foreground: #e8f0ea;
+  --card: #13211a;
+  --card-foreground: #e8f0ea;
+  --popover: #13211a;
+  --popover-foreground: #e8f0ea;
+  --primary: #4cae84;
+  --primary-foreground: #0c1f16;
+  --secondary: #1b2d23;
+  --secondary-foreground: #e8f0ea;
+  --muted: #1b2d23;
+  --muted-foreground: #8fa196;
+  --accent: #1b2d23;
+  --accent-foreground: #e8f0ea;
+  --destructive: #e0654d;
+  --border: #24382d;
+  --input: #24382d;
+  --ring: #4cae84;
+  --chart-1: #4cae84;
+  --chart-2: #e0a44c;
+  --chart-3: #2c7a5b;
+  --chart-4: #b08d57;
+  --chart-5: #6ea193;
+  --sidebar: #0c3b2e;
+  --sidebar-foreground: #e8f0ea;
+  --sidebar-primary: #4cae84;
+  --sidebar-primary-foreground: #0c1f16;
+  --sidebar-accent: #134636;
+  --sidebar-accent-foreground: #e8f0ea;
+  --sidebar-border: #1c5140;
+  --sidebar-ring: #4cae84;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01";
+  }
+  ::selection {
+    background: #0c5c42;
+    color: #f2fbf6;
+  }
+}
+
+/* ===== تويرات الهوية ===== */
+
+/* خلفية الورق: نقط خفيفة جدًا + تدرج دافي فوق */
+.paper-bg {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(oklch(0.45 0.06 160 / 0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* النافبار الغامق: تدرج صنوبري مع لمعة خفيفة */
+.pine-bar {
+  background:
+    radial-gradient(120% 180% at 85% -20%, oklch(0.52 0.11 162 / 0.35) 0%, transparent 55%),
+    linear-gradient(160deg, #0c3b2e 0%, #0f4534 55%, #0c3b2e 100%);
+}
+
+/* ظل الكروت الاحترافي: طبقة رقيقة + عمق ناعم أخضر */
+.card-lift {
+  box-shadow:
+    0 1px 2px rgb(23 37 31 / 0.05),
+    0 12px 32px -16px rgb(12 60 45 / 0.18);
+}
+
+/* تذكرة الاستخراج */
+.ticket {
+  position: relative;
+}
+/* سنون التدوير (perforation) — دايرة على كل جنب جوه صف الفاصل المنقّط */
+.punch-hole {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--background);
+  border: 1.5px dashed #c9c4b4;
+  flex-shrink: 0;
+}
+/* الخط المنقّط الفاصل جوه التذكرة */
+.ticket-dash {
+  background-image: linear-gradient(to left, #c9c4b4 55%, transparent 45%);
+  background-size: 12px 1.5px;
+  background-repeat: repeat-x;
+  height: 1.5px;
+  flex: 1;
+}
+
+/* رقم متابعة mono بخط متباعد */
+.tracking-code {
+  font-family: var(--font-mono);
+  letter-spacing: 0.18em;
+}
+
+/* أنيميشن دخول ناعم */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.rise-in-late {
+  animation: rise-in 0.55s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* شبكة المحافظة الصغيرة في كارت المحافظة */
+.gov-swatch {
+  background-image: linear-gradient(135deg, oklch(0.55 0.12 162 / 0.14) 25%, transparent 25%);
+  background-size: 8px 8px;
+}
+
+/* ===== M3: طباعة A6 — الليبل بس هو اللي بيتطبع، والباقي كله مخفي ===== */
+.print-root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A6 portrait;
+    margin: 6mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  /* نخفي كل حاجة على الشاشة ونسيب الليبل بس */
+  body * {
+    visibility: hidden !important;
+  }
+
+  .print-root {
+    display: block !important;
+  }
+
+  .print-root,
+  .print-root * {
+    visibility: visible !important;
+  }
+
+  .print-root {
+    position: absolute !important;
+    inset: 0 !important;
+  }
+
+  .print-page {
+    page-break-after: always;
+    break-after: page;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .print-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  .print-label {
+    box-shadow: none !important;
+    border: 1.5px dashed #999999 !important;
+    width: 100% !important;
+    min-height: 136mm !important; /* 148 − هوامش الصفحة */
+  }
+}
+
+.print-label {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
