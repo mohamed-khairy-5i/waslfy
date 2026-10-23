@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { extractShipment } from 'waslfy-parser';
+import { extractShipment, mkField, GOVERNORATES } from 'waslfy-parser';
+import type { Field, ShipmentFields, GovResult } from 'waslfy-parser';
 import {
   ShieldCheck,
   EyeOff,
@@ -15,6 +16,9 @@ import {
   Lock,
   Banknote,
   Sparkles,
+  WandSparkles,
+  Loader2,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -53,12 +57,77 @@ const SAMPLES: { label: string; text: string }[] = [
   },
 ];
 
+const BP = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
+/** شكل رد /api/smart-mode — كل الحقول اختيارية (null = الموديل مش لاقي حاجة) */
+interface SmartSuggestion {
+  name: string | null;
+  phone: string | null;
+  governorate: string | null;
+  address: string | null;
+  amount: number | null;
+  note: string | null;
+}
+
+/** مطابقة اسم المحافظة اللي رجع الـ AI مع قاموس المحرك */
+function matchGovernorate(raw: string | null): GovResult | null {
+  if (!raw) return null;
+  const norm = raw.replace(/^محافظة\s*/, '').trim();
+  const direct = GOVERNORATES.find((g) => g.name === norm || norm.includes(g.name) || g.name.includes(norm));
+  return direct ? { id: direct.id, name: direct.name } : null;
+}
+
+/**
+ * دمج اقتراحات Smart Mode على المسودة:
+ * - بنستبدل بس الحقول الفاضية/منخفضة الثقة — ممنوع نكسر استخراج ناجح.
+ * - كل اقتراح بييجي بثقة 'medium' ومصدر 'smart-ai' — عقد الممنوعات الصامتة ثابت.
+ */
+function mergeSmart(base: ShipmentFields, s: SmartSuggestion): ShipmentFields {
+  const swap = <T,>(cur: Field<T>, next: T | null): Field<T> => {
+    if (next == null) return cur;
+    if (cur.confidence !== 'empty' && cur.confidence !== 'low') return cur;
+    return mkField(next, 'medium', 'smart-ai');
+  };
+  return {
+    name: swap(base.name, s.name),
+    phones: s.phone
+      ? base.phones.confidence === 'empty' || base.phones.confidence === 'low'
+        ? mkField([s.phone], 'medium', 'smart-ai')
+        : base.phones
+      : base.phones,
+    governorate: swap(base.governorate, matchGovernorate(s.governorate) as GovResult | null),
+    address: swap(base.address, s.address),
+    amount: swap(base.amount, s.amount),
+  };
+}
+
 export default function Home() {
   const [text, setText] = useState(SAMPLES[0].text);
   const [ms, setMs] = useState<number | null>(null);
   const [justSaved, setJustSaved] = useState(false);
+  const [smartState, setSmartState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
+  const [smartError, setSmartError] = useState<string | null>(null);
+  const [smartNote, setSmartNote] = useState<string | null>(null);
+  const [overrides, setOverrides] = useState<SmartSuggestion | null>(null);
 
-  const draft = useMemo(() => (text.trim() ? extractShipment(text) : null), [text]);
+  const base = useMemo(() => (text.trim() ? extractShipment(text) : null), [text]);
+  const draft = useMemo(
+    () => (base && overrides ? mergeSmart(base, overrides) : base),
+    [base, overrides]
+  );
+  const needsHelp = useMemo(() => {
+    if (!draft) return false;
+    return (
+      draft.name.confidence === 'empty' ||
+      draft.name.confidence === 'low' ||
+      draft.phones.confidence === 'empty' ||
+      draft.phones.confidence === 'low' ||
+      draft.governorate.confidence === 'empty' ||
+      draft.governorate.confidence === 'low' ||
+      draft.amount.confidence === 'empty' ||
+      draft.amount.confidence === 'low'
+    );
+  }, [draft]);
   const accuracy = useMemo(() => evaluateCorpus(), []);
   const overall = useMemo(() => overallAccuracy(accuracy), [accuracy]);
   const savedCount = useLiveQuery(() => db.shipments.count(), []);
@@ -70,12 +139,51 @@ export default function Home() {
     setTimeout(() => setJustSaved(false), 2500);
   }
 
+  async function runSmart() {
+    if (!text.trim()) return;
+    setSmartState('loading');
+    setSmartError(null);
+    try {
+      const res = await fetch(`${BP}/api/smart-mode`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      const data = (await res.json()) as SmartSuggestion & { error?: string; code?: string };
+      if (!res.ok) {
+        if (data.code === 'NO_AI') {
+          setSmartError(
+            'Smart Mode محتاج تفعيل Workers AI من إعدادات المشروع على داشبورد Cloudflare (زرار واحد) — والاستخراج المحلي شغّال زي الفل من غيره.'
+          );
+        } else {
+          setSmartError(data.error ?? 'حصلت مشكلة — جرّب تاني.');
+        }
+        setSmartState('error');
+        return;
+      }
+      setOverrides(data);
+      setSmartNote(data.note);
+      setSmartState('done');
+    } catch {
+      setSmartError('مقدرناش نوصل لمساعد Smart Mode — بتشتغل من استضافة تدعم Functions (waslfy.pages.dev).');
+      setSmartState('error');
+    }
+  }
+
   useEffect(() => {
     const t0 = performance.now();
     if (text.trim()) extractShipment(text);
     const elapsed = performance.now() - t0;
     const raf = requestAnimationFrame(() => setMs(elapsed));
     return () => cancelAnimationFrame(raf);
+  }, [text]);
+
+  // أي تعديل على النص = الاقتراحات القديمة بتموت — مينفعش اقتراح لرسالة قديمة
+  useEffect(() => {
+    setOverrides(null);
+    setSmartNote(null);
+    setSmartState('idle');
+    setSmartError(null);
   }, [text]);
 
   return (
@@ -225,6 +333,83 @@ export default function Home() {
                   WSLFY-LIVE-{new Date().getFullYear()}
                 </span>
               </div>
+
+              {/* Smart Mode — مساعد اختياري للرسائل الصعبة */}
+              {needsHelp && (
+                <div className="border-b border-dashed border-[#e2ded1] bg-[#fbfaf6] px-5 py-3.5 sm:px-7">
+                  {smartState === 'done' ? (
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="flex flex-wrap items-center gap-2 text-[12.5px] font-semibold text-[#0c5c42]">
+                        <Sparkles className="h-4 w-4" />
+                        اقتراحات Smart Mode اتضافت — كلها بثقة متوسطة ومصدرها AI
+                        {smartNote ? (
+                          <span className="font-normal text-[#6f7a70]">— {smartNote}</span>
+                        ) : null}
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 rounded-full px-3 text-[12px] text-[#a09c8d] hover:text-[#b3402a]"
+                        onClick={() => {
+                          setOverrides(null);
+                          setSmartNote(null);
+                          setSmartState('idle');
+                        }}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                        شيل الاقتراحات
+                      </Button>
+                    </div>
+                  ) : smartState === 'error' ? (
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="flex items-center gap-2 text-[12.5px] font-medium text-[#9a4a1c]">
+                        <AlertTriangle className="h-4 w-4" />
+                        {smartError}
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 rounded-full border-[#dcd8ca] px-3 text-[12px] text-[#4b564e]"
+                        onClick={runSmart}
+                      >
+                        <WandSparkles className="h-3.5 w-3.5" />
+                        جرّب تاني
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="flex items-center gap-2 text-[12.5px] font-bold text-[#17251f]">
+                          <WandSparkles className="h-4 w-4 text-[#c97b10]" />
+                          في حقول محتاجة مراجعة — تحب مساعد AI يقترح قيم؟
+                        </p>
+                        <p className="mt-0.5 max-w-xl text-[11px] leading-5 text-[#8a9188]">
+                          اختياري: نص الرسالة هيتبعت لـ Workers AI على Cloudflare للتحليل بس —
+                          مفيش أي تخزين، والاقتراحات بتنزل بثقة متوسطة وتحتاج تأكيدك.
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="h-8 shrink-0 rounded-full bg-[#c97b10] px-4 text-[12.5px] font-bold text-white hover:bg-[#b36c0c]"
+                        onClick={runSmart}
+                        disabled={smartState === 'loading'}
+                      >
+                        {smartState === 'loading' ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            بيسأل الـ AI…
+                          </>
+                        ) : (
+                          <>
+                            <WandSparkles className="h-4 w-4" />
+                            Smart Mode
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* صفوف الحقول */}
               <div className="divide-y divide-dashed divide-[#e2ded1]">
@@ -456,11 +641,11 @@ export default function Home() {
       <footer className="pine-bar mt-auto border-t border-white/10">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-5 text-xs text-[#9dbcae] sm:px-6">
           <span className="tracking-code text-[10.5px] font-semibold text-[#c3d8cb]">
-            waslfy-parser v0.1.0 — صفر dependencies
+            waslfy-parser — صفر dependencies · open source
           </span>
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-[#7fe0ae]" />
-            الجاي: M5 Offline PWA ← M6 Smart Mode ← M7 npm publish
+            استخراج محلي · PWA أوفلاين · Smart Mode اختياري
           </span>
         </div>
       </footer>

@@ -28,7 +28,7 @@
 
 | | |
 | --- | --- |
-| 🔒 **Privacy-first / خصوصية مطلقة** | No server, no account, no tracking. The parser runs **in the browser** — customer data never leaves the device. IndexedDB via Dexie for storage. |
+| 🔒 **Privacy-first / خصوصية مطلقة** | No server, no account, no tracking. The parser runs **in the browser** — customer data never leaves the device. IndexedDB via Dexie for storage. The only exception is **opt-in**: Smart Mode, where you choose to send one message text to Workers AI for suggestions (nothing stored, suggestions stay medium-confidence and need your review). |
 | 🚫 **No silent values / ممنوع القيم الصامتة** | Every field carries `{ value, confidence, source, confirmed }`. Low/empty fields **block printing and exporting** until a human reviews them. No guessed values, ever. |
 | 📏 **Measured accuracy / دقة مقاسة** | Not marketing numbers — the accuracy report on the page runs live on the same public corpus used in CI: **100% on all 5 fields (40-message corpus)**, with address being low-confidence-by-design. |
 | 🧩 **Zero dependencies / صفر dependencies** | The parser package ships with **0 runtime dependencies** — pure TypeScript, ~10KB. Arabic normalization, Levenshtein governorate matching, Egyptian phone regex, city→governorate map. |
@@ -133,7 +133,7 @@ Ran a real order the parser gets wrong? **Open an issue with the raw text (redac
 - [x] **M4** — Excel export (carrier templates) + backup/restore with smart merge
 - [x] **UI v2** — Cairo-paper identity, receipt-style extraction ticket
 - [x] **M5** — Offline PWA (installable, works with no network — hand-rolled service worker, no next-pwa dependency)
-- [ ] **M6** — Smart Mode (optional AI assist via server-side worker for the hard messages — still no data storage)
+- [x] **M6** — Smart Mode: optional AI assist for hard messages — opt-in button on the receipt, text sent to Workers AI on Cloudflare (one dashboard toggle), suggestions capped at **medium** confidence with `source: smart-ai`, zero storage
 - [x] **M7** — npm publish ([waslfy-parser@0.1.0](https://www.npmjs.com/package/waslfy-parser)) + dual hosting (Cloudflare Pages + GitHub Pages)
 - [x] **M7.1** — repo landing polish (demo GIF in README + OG/Twitter card image) + first release [v0.1.1](https://github.com/mohamed-khairy-5i/waslfy/releases/tag/v0.1.1)
 

@@ -2,6 +2,14 @@
 
 All notable changes to Waslfy are documented here. Format based on [Keep a Changelog](https://keepachangelog.com/), versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Added — app (M6 Smart Mode)
+- **Smart Mode**: opt-in AI assist for messages the local engine flags as incomplete/low-confidence.
+- Cloudflare Pages Function `POST /api/smart-mode` (stateless, zero storage, 2000-char cap) → Workers AI (`@cf/meta/llama-3.1-8b-instruct`), with strict JSON parsing + sanitization server-side (phone must match `01\d{9}`, amount sanity-capped, Arabic-Indic digits normalized).
+- Suggestions merge only into empty/low-confidence fields — successful local extractions are never overwritten — and arrive capped at **medium** confidence with `source: smart-ai`, keeping the "no silent values" contract intact.
+- Graceful degradation: on GitHub Pages (no Functions) or before enabling the AI binding, the UI explains exactly what to enable instead of failing silently.
+
 ## [0.1.1] — 2026-10
 
 ### Fixed — parser (`waslfy-parser@0.1.1`)
