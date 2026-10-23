@@ -74,6 +74,8 @@ npm run web:dev
 
 ## Use the parser / استخدم المحرك
 
+**On npm:** [`waslfy-parser`](https://www.npmjs.com/package/waslfy-parser) — zero dependencies, ESM + CJS + TypeScript types, ~13 kB min+gz.
+
 ```bash
 npm install waslfy-parser
 ```
@@ -130,7 +132,8 @@ Ran a real order the parser gets wrong? **Open an issue with the raw text (redac
 - [x] **UI v2** — Cairo-paper identity, receipt-style extraction ticket
 - [x] **M5** — Offline PWA (installable, works with no network — hand-rolled service worker, no next-pwa dependency)
 - [ ] **M6** — Smart Mode (optional AI assist via server-side worker for the hard messages — still no data storage)
-- [ ] **M7** — npm publish + landing page + demo GIF
+- [x] **M7** — npm publish ([waslfy-parser@0.1.0](https://www.npmjs.com/package/waslfy-parser)) + dual hosting (Cloudflare Pages + GitHub Pages)
+- [ ] **M7.1** — landing page + demo GIF
 
 ## Contributing / تشارك؟
 
