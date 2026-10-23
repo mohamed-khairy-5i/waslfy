@@ -80,3 +80,24 @@ describe('extraction contract', () => {
     expect(r.amount.confidence).toBe('empty');
   });
 });
+
+describe('regression: label-bleed edge cases (review findings)', () => {
+  it('bare labels with empty values never become a name', () => {
+    const r = extractShipment('الاسم:\nالتليفون:\nالعنوان:');
+    expect(r.name.value).toBe('');
+    expect(r.name.confidence).toBe('empty');
+  });
+
+  it('definite-article labels stop capture for the following fields', () => {
+    // الاسم فاضي — اللي بعده labels مش قيم
+    const r = extractShipment('الاسم:\nالتليفون: 01001234567\nالكود: 450 جنيه');
+    expect(r.name.value).toBe('');
+    expect(r.phones.value).toEqual(['01001234567']);
+    expect(r.amount.value).toBe(450);
+  });
+
+  it('label on its own line still picks the value on the next line', () => {
+    const r = extractShipment('الاسم:\nمحمد علي أحمد');
+    expect(r.name.value).toBe('محمد علي أحمد');
+  });
+});

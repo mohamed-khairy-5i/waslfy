@@ -22,7 +22,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
+          cache: npm
+      - run: npm ci
       - run: npm test
       - name: Build static export (basePath /waslfy)
         run: npm run web:build
@@ -51,7 +52,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
+          cache: npm
+      - run: npm ci
       - name: Build static export (no basePath)
         run: STATIC_EXPORT=1 npm run web:build
       - name: Deploy to Cloudflare Pages
@@ -59,4 +61,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wrangler-version: "4"
           command: pages deploy apps/web/out --project-name=waslfy --branch=main --commit-dirty=true

@@ -111,7 +111,7 @@ interface Field<T> {
 
 ## Accuracy / الدقة
 
-Measured live in CI on the public corpus (`packages/parser/test/corpus/` — 40 messages: MSA, Egyptian dialect, English, Arabic-Indic numerals, one-liners, edge cases). Empty extraction counts as a miss, not a pass.
+Measured live in CI on the public corpus (`packages/parser/src/data/corpus.ts` — 40 messages: MSA, Egyptian dialect, English, Arabic-Indic numerals, one-liners, edge cases). Empty extraction counts as a miss, not a pass.
 
 | Field | Result | Target |
 | --- | --- | --- |
