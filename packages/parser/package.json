@@ -42,13 +42,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/waslfy/waslfy.git",
+    "url": "git+https://github.com/mohamed-khairy-5i/waslfy.git",
     "directory": "packages/parser"
   },
   "bugs": {
-    "url": "https://github.com/waslfy/waslfy/issues"
+    "url": "https://github.com/mohamed-khairy-5i/waslfy/issues"
   },
-  "homepage": "https://github.com/waslfy/waslfy#readme",
+  "homepage": "https://github.com/mohamed-khairy-5i/waslfy#readme",
   "engines": {
     "node": ">=18"
   },

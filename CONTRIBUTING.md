@@ -15,7 +15,7 @@ Your message becomes a corpus entry with an assertion — which means every futu
 ## Local development
 
 ```bash
-git clone https://github.com/waslfy/waslfy.git
+git clone https://github.com/mohamed-khairy-5i/waslfy.git
 cd waslfy
 npm install
 

@@ -4,7 +4,7 @@
 
 **من رسالة واتساب لإيصال شحن — كل حاجة على جهازك.**
 
-[![CI](https://github.com/waslfy/waslfy/actions/workflows/ci.yml/badge.svg)](https://github.com/waslfy/waslfy/actions/workflows/ci.yml)
+[![CI](https://github.com/mohamed-khairy-5i/waslfy/actions/workflows/ci.yml/badge.svg)](https://github.com/mohamed-khairy-5i/waslfy/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/waslfy-parser)](https://www.npmjs.com/package/waslfy-parser)
 [![License: MIT](https://img.shields.io/badge/License-MIT-0c5c42.svg)](LICENSE)
 [![Zero dependencies](https://img.shields.io/badge/parser%20dependencies-0-0c5c42)](packages/parser)
@@ -53,7 +53,7 @@ waslfy/
 ## Quick start / ابدأ في دقيقة
 
 ```bash
-git clone https://github.com/waslfy/waslfy.git
+git clone https://github.com/mohamed-khairy-5i/waslfy.git
 cd waslfy
 npm install
 
