@@ -4,7 +4,10 @@
 
 **من رسالة واتساب لإيصال شحن — كل حاجة على جهازك.**
 
+> 🔗 **جربه لايف / Try it live:** **[mohamed-khairy-5i.github.io/waslfy](https://mohamed-khairy-5i.github.io/waslfy/)** — يشتغل أوفلاين بعد أول زيارة، وتقدر تثبّته كتطبيق من زر "ثبّت التطبيق".
+
 [![CI](https://github.com/mohamed-khairy-5i/waslfy/actions/workflows/ci.yml/badge.svg)](https://github.com/mohamed-khairy-5i/waslfy/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/demo-live-0c5c42)](https://mohamed-khairy-5i.github.io/waslfy/)
 [![npm](https://img.shields.io/npm/v/waslfy-parser)](https://www.npmjs.com/package/waslfy-parser)
 [![License: MIT](https://img.shields.io/badge/License-MIT-0c5c42.svg)](LICENSE)
 [![Zero dependencies](https://img.shields.io/badge/parser%20dependencies-0-0c5c42)](packages/parser)
